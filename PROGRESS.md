@@ -126,7 +126,19 @@
 - Built complete backend Auth API (register, OTP verify, login, protected routes)
 - Connected frontend Signup/Login to backend APIs
 - Created OTP verification page with 6-digit input
-- Added email domain validation (frontend + backend)
-- Added password strength meter on signup
-- Security audit: added rate limiting, Zod validation, .gitignore, removed test scripts
+- Added email domain validation (frontend + backend) — only gmail, yahoo, outlook etc. allowed
+- Added password strength meter on signup (8+ chars, uppercase, lowercase, number, special char)
+- Security audit: 6 critical issues found & fixed
+  - Removed hardcoded credentials from source code
+  - Created root `.gitignore` to protect `.env`, `node_modules`, `venv`
+  - Added rate limiting (10 auth/15min, 5 OTP/5min)
+  - Added Zod validation middleware on all auth endpoints
+  - Moved API URL to environment variable
+  - Deleted test scripts with email references
+- Renamed "MemoraAI" → "PixMind" across all docs (8 files)
+- Created comprehensive README.md with teammate setup guide
+- Removed Vite boilerplate files (react.svg, vite.svg, App.css, oxlintrc, etc.)
+- Pushed to GitHub: https://github.com/KajalNautiyal/PixMind (3 commits)
+- **GitHub Repo:** https://github.com/KajalNautiyal/PixMind
 - **Next Priority:** Dashboard page, Photo upload, Gallery
+
