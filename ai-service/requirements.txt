@@ -1,0 +1,11 @@
+Flask
+opencv-python-headless
+ultralytics
+torch
+torchvision
+transformers
+insightface
+easyocr
+pytest
+ruff
+black
