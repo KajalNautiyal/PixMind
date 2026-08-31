@@ -1,4 +1,4 @@
-# MemoraAI — Development Rules
+# PixMind — Development Rules
 
 ## 1. General Rule
 

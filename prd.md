@@ -1,8 +1,8 @@
-# MemoraAI — Product Requirements Document (PRD)
+# PixMind — Product Requirements Document (PRD)
 
 ## 1. Product Name
 
-**MemoraAI — Privacy-First Intelligent Cloud Photo & Memory Management Platform**
+**PixMind — Privacy-First Intelligent Cloud Photo & Memory Management Platform**
 
 ### Tagline
 
@@ -19,7 +19,7 @@ Traditional photo storage tools are excellent at storing and displaying media, b
 - protecting sensitive documents
 - reconstructing events and memories
 
-MemoraAI aims to reduce this manual work using AI while keeping privacy and user control central.
+PixMind aims to reduce this manual work using AI while keeping privacy and user control central.
 
 ---
 

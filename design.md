@@ -1,8 +1,8 @@
-# MemoraAI — Product & UI/UX Design
+# PixMind — Product & UI/UX Design
 
 ## 1. Design Vision
 
-MemoraAI should feel like a modern personal memory space, not a generic cloud-drive application.
+PixMind should feel like a modern personal memory space, not a generic cloud-drive application.
 
 Design principles:
 1. Photo-first
@@ -19,7 +19,7 @@ Design principles:
 Desktop:
 
 ```text
-Logo / MemoraAI
+Logo / PixMind
 
 Home
 Photos

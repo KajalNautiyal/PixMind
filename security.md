@@ -1,8 +1,8 @@
-# MemoraAI — Security Specification
+# PixMind — Security Specification
 
 ## 1. Security Objective
 
-MemoraAI handles highly personal data:
+PixMind handles highly personal data:
 - photos
 - faces
 - locations

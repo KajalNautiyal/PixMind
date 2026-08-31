@@ -1,4 +1,4 @@
-# MemoraAI — Code & Architecture Review Checklist
+# PixMind — Code & Architecture Review Checklist
 
 ## 1. Purpose
 

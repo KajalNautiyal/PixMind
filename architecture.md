@@ -1,8 +1,8 @@
-# MemoraAI — System Architecture
+# PixMind — System Architecture
 
 ## 1. Overview
 
-MemoraAI is a privacy-first intelligent cloud photo and memory management platform.
+PixMind is a privacy-first intelligent cloud photo and memory management platform.
 
 The system stores original media in object storage and keeps structured metadata, relationships, AI outputs, permissions, and vector embeddings in MongoDB Atlas. AI processing runs as a separate Python service so that the main Node.js API remains focused on application logic.
 

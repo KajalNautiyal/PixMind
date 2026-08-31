@@ -1,4 +1,4 @@
-# MemoraAI (PixMind) — Project Progress Tracker
+# PixMind (PixMind) — Project Progress Tracker
 
 > **Last Updated:** 2026-08-31
 > **Purpose:** Yeh file har chat session ke across context maintain karti hai. Naye chat mein AI ko bolo "read PROGRESS.md first" toh poora context mil jaayega.
@@ -7,7 +7,7 @@
 
 ## 🏗️ Project Overview
 
-- **Name:** MemoraAI (folder: PixMind)
+- **Name:** PixMind (folder: PixMind)
 - **Type:** Privacy-First Intelligent Cloud Photo & Memory Management Platform
 - **Team Size:** 4 members
 - **Tech Stack:** React + Vite + Tailwind (Frontend) | Node.js + Express (Backend) | Python + Flask (AI Service) | MongoDB Atlas + AWS S3

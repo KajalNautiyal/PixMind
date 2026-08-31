@@ -1,4 +1,4 @@
-# 🧠 MemoraAI (PixMind)
+# 🧠 PixMind (PixMind)
 
 > **Privacy-First Intelligent Cloud Photo & Memory Management Platform**
 > 
@@ -82,7 +82,7 @@ cp .env.example .env
 
 Edit `.env` and fill in your credentials:
 ```env
-MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/memoraai
+MONGO_URI=mongodb+srv://<username>:<password>@<cluster>.mongodb.net/PixMind
 JWT_SECRET=your_random_secret_string
 SMTP_USER=your_email@gmail.com
 SMTP_PASS=your_gmail_app_password
