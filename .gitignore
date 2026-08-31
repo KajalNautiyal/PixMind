@@ -41,6 +41,13 @@ test-register.ps1
 # Playwright
 .playwright/
 
+# Vite default boilerplate files
+frontend/src/assets/react.svg
+frontend/src/assets/vite.svg
+frontend/src/App.css
+frontend/.oxlintrc.json
+frontend/public/icons.svg
+
 # Strix tools (large binaries ~70MB)
 strix_tools/
 
