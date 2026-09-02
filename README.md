@@ -138,10 +138,10 @@ Register → OTP sent to email → Verify OTP → Account active → Login → J
 
 | Member | Domain |
 |---|---|
-| **Member 1** | Core Platform & Cloud (Auth, Upload, S3, Albums) |
-| **Member 2** | AI Semantic Search (Embeddings, Search, Objects, Captions) |
-| **Member 3** | Computer Vision & Privacy (Face Recognition, Privacy Guardian, Cleanup) |
-| **Member 4** | Memory Intelligence (Events, Timeline, Memories, AI Assistant) |
+| **Member 1** | Core Platform & Cloud Storage — Authentication, Image Upload, AWS S3 Integration, Album Management |
+| **Member 2** | AI-Powered Image Understanding — Image Embeddings, Semantic Search, Object Detection, Image Captioning |
+| **Member 3** | Computer Vision & Privacy — Face Recognition, Face Grouping, Privacy Protection, Sensitive Content Detection |
+| **Member 4** | Photo Management & Optimization — Duplicate Detection, Image Optimization, Photo Metadata Extraction & Management |
 
 ---
 
