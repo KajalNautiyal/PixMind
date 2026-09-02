@@ -1,74 +1,93 @@
 import React from 'react';
 import { Outlet } from 'react-router-dom';
-import { ImageIcon } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Logo } from '../components/ui/Logo';
+import { Search, Shield, Zap } from 'lucide-react';
 
 const AuthLayout = () => {
   return (
-    <div className="min-h-screen w-full flex bg-white">
+    <div className="min-h-screen w-full flex bg-white font-sans overflow-hidden">
       {/* Left side — Form area */}
-      <div className="flex flex-col flex-1 items-center justify-center px-6 sm:px-8 lg:flex-none lg:w-[480px] xl:w-[520px]">
+      <div className="flex flex-col flex-1 items-center justify-center px-6 sm:px-8 lg:flex-none lg:w-[480px] xl:w-[520px] relative z-10 bg-white">
         <div className="w-full max-w-[380px]">
           {/* Logo */}
-          <div className="flex items-center gap-2.5 mb-10">
-            <div className="bg-[#6c5ce7] p-2 rounded-xl text-white shadow-md shadow-[#6c5ce7]/20">
-              <ImageIcon size={22} strokeWidth={2.5} />
-            </div>
-            <span className="text-xl font-bold tracking-tight text-gray-900">
-              PixMind
-            </span>
-          </div>
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="flex items-center gap-2.5 mb-10"
+          >
+            <Logo />
+          </motion.div>
           
           {/* Form content injected here */}
-          <Outlet />
+          <motion.div
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.6, delay: 0.1 }}
+          >
+            <Outlet />
+          </motion.div>
           
         </div>
       </div>
 
-      {/* Right side — Visual panel */}
-      <div className="hidden lg:flex relative flex-1 items-center justify-center overflow-hidden">
-        {/* Background layers */}
-        <div className="absolute inset-0 bg-gradient-to-br from-[#f8f7ff] via-[#ede9fe] to-[#e0d4fc]"></div>
+      {/* Right side — Premium Visual Panel */}
+      <div className="hidden lg:flex relative flex-1 items-center justify-center bg-gray-900 overflow-hidden">
+        {/* Animated Mesh Gradients */}
+        <div className="absolute top-[-10%] left-[-10%] w-[50vw] h-[50vw] bg-indigo-500/30 rounded-full blur-[120px] animate-blob mix-blend-screen"></div>
+        <div className="absolute bottom-[-10%] right-[-10%] w-[40vw] h-[40vw] bg-purple-500/30 rounded-full blur-[100px] animate-blob animation-delay-2000 mix-blend-screen"></div>
+        <div className="absolute top-[40%] right-[30%] w-[30vw] h-[30vw] bg-pink-500/30 rounded-full blur-[120px] animate-blob animation-delay-4000 mix-blend-screen"></div>
         
-        {/* Decorative floating shapes */}
-        <div className="absolute top-20 right-20 w-72 h-72 bg-[#6c5ce7]/10 rounded-full blur-3xl animate-pulse"></div>
-        <div className="absolute bottom-32 left-16 w-56 h-56 bg-[#a29bfe]/15 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '1s' }}></div>
-        <div className="absolute top-1/2 right-1/3 w-40 h-40 bg-[#6c5ce7]/8 rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2s' }}></div>
-        
-        {/* Grid pattern overlay */}
-        <div className="absolute inset-0 opacity-[0.03]" style={{
-          backgroundImage: 'radial-gradient(circle, #6c5ce7 1px, transparent 1px)',
-          backgroundSize: '32px 32px'
-        }}></div>
+        {/* Subtle grid pattern */}
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle, #ffffff 1px, transparent 1px)', backgroundSize: '32px 32px' }}></div>
 
-        {/* Content */}
-        <div className="relative z-10 text-center max-w-md px-10">
-          {/* Decorative photo grid mockup */}
-          <div className="mb-10 flex justify-center">
-            <div className="grid grid-cols-3 gap-2.5 transform -rotate-3">
-              {[
-                'bg-gradient-to-br from-rose-200 to-rose-300',
-                'bg-gradient-to-br from-sky-200 to-sky-300',
-                'bg-gradient-to-br from-amber-200 to-amber-300',
-                'bg-gradient-to-br from-emerald-200 to-emerald-300',
-                'bg-gradient-to-br from-violet-200 to-violet-300',
-                'bg-gradient-to-br from-pink-200 to-pink-300',
-              ].map((color, i) => (
-                <div
-                  key={i}
-                  className={`w-20 h-20 rounded-xl ${color} shadow-sm`}
-                  style={{ animationDelay: `${i * 0.1}s` }}
-                />
-              ))}
+        {/* Center Glass Card */}
+        <motion.div 
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: "easeOut" }}
+          className="relative z-10 w-full max-w-lg p-10 bg-white/10 backdrop-blur-2xl rounded-3xl border border-white/20 shadow-2xl flex flex-col gap-8"
+        >
+          {/* Floating UI Element 1 */}
+          <motion.div 
+            animate={{ y: [0, -10, 0] }}
+            transition={{ repeat: Infinity, duration: 4, ease: "easeInOut" }}
+            className="bg-white/90 backdrop-blur-md rounded-2xl p-4 flex items-center gap-4 shadow-lg border border-white/50"
+          >
+            <div className="w-12 h-12 rounded-xl bg-indigo-100 flex items-center justify-center">
+              <Search className="text-indigo-600" size={24} />
             </div>
-          </div>
+            <div>
+              <p className="text-gray-900 font-semibold text-sm">Semantic Search</p>
+              <p className="text-gray-500 text-xs">"Find photos of my dog at the beach"</p>
+            </div>
+          </motion.div>
 
-          <h2 className="text-2xl font-bold text-gray-800 mb-3 leading-tight">
-            Your photos, <br />intelligently organized.
-          </h2>
-          <p className="text-gray-500 text-[15px] leading-relaxed">
-            Upload, search, and relive your memories — all in one private, secure space.
-          </p>
-        </div>
+          {/* Floating UI Element 2 */}
+          <motion.div 
+            animate={{ y: [0, 10, 0] }}
+            transition={{ repeat: Infinity, duration: 5, ease: "easeInOut" }}
+            className="bg-white/90 backdrop-blur-md rounded-2xl p-4 flex items-center gap-4 shadow-lg border border-white/50 self-end w-4/5"
+          >
+            <div className="w-12 h-12 rounded-xl bg-rose-100 flex items-center justify-center">
+              <Shield className="text-rose-500" size={24} />
+            </div>
+            <div>
+              <p className="text-gray-900 font-semibold text-sm">Privacy Vault</p>
+              <p className="text-gray-500 text-xs">Sensitive documents secured.</p>
+            </div>
+          </motion.div>
+          
+          <div className="mt-4 text-center">
+            <h2 className="text-3xl font-bold text-white mb-3 tracking-tight">
+              Intelligence meets Privacy.
+            </h2>
+            <p className="text-indigo-100/80 text-[15px] leading-relaxed max-w-sm mx-auto">
+              Experience the next generation of photo management. Your memories, beautifully organized and fully private.
+            </p>
+          </div>
+        </motion.div>
       </div>
     </div>
   );

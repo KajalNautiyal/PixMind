@@ -37,8 +37,18 @@ const otpSchema = z.object({
   otp: z.string().length(6, 'OTP must be 6 digits').regex(/^\d+$/, 'OTP must contain only digits'),
 });
 
+const forgotPasswordSchema = z.object({
+  email: emailSchema,
+});
+
 const resendOTPSchema = z.object({
   email: emailSchema,
+});
+
+const resetPasswordSchema = z.object({
+  email: emailSchema,
+  otp: z.string().length(6, 'OTP must be 6 digits'),
+  newPassword: passwordSchema,
 });
 
 /**
@@ -48,7 +58,7 @@ const validate = (schema) => (req, res, next) => {
   try {
     const result = schema.safeParse(req.body);
     if (!result.success) {
-      const errors = result.error.errors.map((e) => e.message);
+      const errors = result.error.issues.map((e) => e.message);
       return res.status(400).json({
         success: false,
         message: errors[0],
@@ -58,6 +68,7 @@ const validate = (schema) => (req, res, next) => {
     req.body = result.data; // Use sanitized data
     next();
   } catch (error) {
+    console.error('Validation exception:', error);
     return res.status(400).json({
       success: false,
       message: 'Invalid input',
@@ -65,4 +76,4 @@ const validate = (schema) => (req, res, next) => {
   }
 };
 
-module.exports = { validate, registerSchema, loginSchema, otpSchema, resendOTPSchema };
+module.exports = { validate, registerSchema, loginSchema, otpSchema, resendOTPSchema, forgotPasswordSchema, resetPasswordSchema };

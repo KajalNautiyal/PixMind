@@ -189,7 +189,7 @@ const login = async (req, res) => {
     if (!user) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password',
+        message: 'No account found with this email. Please sign up.',
       });
     }
 
@@ -204,7 +204,7 @@ const login = async (req, res) => {
     if (!isMatch) {
       return res.status(401).json({
         success: false,
-        message: 'Invalid email or password',
+        message: 'Incorrect password. Please try again.',
       });
     }
 
@@ -268,4 +268,100 @@ const getMe = async (req, res) => {
   }
 };
 
-module.exports = { register, verifyOTP, resendOTP, login, getMe };
+/**
+ * POST /api/v1/auth/forgot-password
+ * Send OTP to email for password reset
+ */
+const forgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'No account found with that email',
+      });
+    }
+
+    const otp = generateOTP();
+    const otpExpiry = new Date(Date.now() + (process.env.OTP_EXPIRY_MINUTES || 10) * 60 * 1000);
+
+    user.otp = {
+      code: otp,
+      expiresAt: otpExpiry,
+    };
+    await user.save();
+
+    await sendOTPEmail(email, otp, user.name);
+
+    res.status(200).json({
+      success: true,
+      message: 'Password reset OTP sent to your email',
+    });
+  } catch (error) {
+    console.error('Forgot password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to process request',
+      error: error.message,
+    });
+  }
+};
+
+/**
+ * POST /api/v1/auth/reset-password
+ * Verify OTP and set new password
+ */
+const resetPassword = async (req, res) => {
+  try {
+    const { email, otp, newPassword } = req.body;
+
+    const user = await User.findOne({ email }).select('+password +otp.code +otp.expiresAt');
+    if (!user) {
+      return res.status(404).json({
+        success: false,
+        message: 'User not found',
+      });
+    }
+
+    if (!user.otp || !user.otp.code) {
+      return res.status(400).json({
+        success: false,
+        message: 'No OTP request found for this email',
+      });
+    }
+
+    if (user.otp.code !== otp) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid OTP',
+      });
+    }
+
+    if (new Date() > user.otp.expiresAt) {
+      return res.status(400).json({
+        success: false,
+        message: 'OTP has expired',
+      });
+    }
+
+    user.password = newPassword;
+    user.otp = undefined; // Clear OTP
+    await user.save();
+
+    res.status(200).json({
+      success: true,
+      message: 'Password successfully reset. You can now login.',
+    });
+  } catch (error) {
+    console.error('Reset password error:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to reset password',
+      error: error.message,
+    });
+  }
+};
+
+module.exports = { register, verifyOTP, resendOTP, login, getMe, forgotPassword, resetPassword };

@@ -35,9 +35,10 @@
 - [x] `Login.jsx` — Login page connected to backend API, email domain validation
 - [x] `Signup.jsx` — Signup page connected to backend API, email domain validation, password strength meter
 - [x] `VerifyOTP.jsx` — 6-digit OTP verification page with auto-focus, paste, resend countdown
+- [x] `ForgotPassword.jsx` & `ResetPassword.jsx` — Password recovery flow
 - [x] `Button.jsx` — Reusable button component
 - [x] `Input.jsx` — Reusable input component with error display
-- [x] `services/api.js` — Axios API service with JWT token interceptor
+- [x] `services/api.js` — Axios API service with JWT token interceptor and 401 auto-logout
 
 ### Backend — Auth API (Done + Secured)
 - [x] Express server (`server.js`) with Helmet, CORS, error handling
@@ -62,6 +63,9 @@
 - [x] Passwords hashed with bcrypt (salt rounds: 12)
 - [x] OTP codes not returned in API responses
 - [x] OTP expiry (10 minutes)
+- [x] **Strict Frontend Route Protection**: Verifies token via API, redirects and clears storage if tampered.
+- [x] **Global 401 Auto-Logout**: Gracefully handles session expiry via Axios interceptor.
+- [x] **IDOR Prevention**: Hardened photo fetching/deletion to strict `req.userId` checks.
 
 ### AI Service Setup (Partial)
 - [x] `requirements.txt` (Flask, OpenCV, YOLO, CLIP, InsightFace, EasyOCR, PyTorch)
@@ -73,20 +77,20 @@
 ## ❌ Remaining Work (MVP — Release 0.1)
 
 ### Backend — Photo Upload
-- [ ] Photo model
-- [ ] Upload routes & controller
-- [ ] S3 signed URL generation
-- [ ] File validation (type, size)
+- [x] Photo model
+- [x] Upload routes & controller (Local uploads via multer)
+- [ ] S3 signed URL generation (Deferred to later phase)
+- [x] File validation (type, size max 10MB)
 
 ### Frontend — Gallery & Upload
-- [ ] Dashboard/Home page
-- [ ] Photo upload UI (drag & drop + file picker)
-- [ ] Photo gallery grid view
+- [x] Dashboard/Home page (Empty state + Image Grid)
+- [x] Photo upload UI (drag & drop modal)
+- [x] Photo gallery grid view (Masonry style placeholders)
 - [ ] Photo detail/lightbox view
 - [ ] Delete/download actions
-- [ ] Upload progress indicator
-- [ ] App layout (sidebar + header)
-- [ ] Protected route wrapper
+- [x] Upload progress indicator (Button loader)
+- [x] App layout (sidebar + header responsive)
+- [x] Protected route wrapper (Validates token against backend)
 
 ### Frontend — Albums
 - [ ] Album list page
@@ -123,22 +127,27 @@
 ### Session — 2026-08-31
 - Reviewed full project status
 - Created PROGRESS.md for cross-session context
-- Built complete backend Auth API (register, OTP verify, login, protected routes)
+- Built complete backend Auth API (register, OTP verify, login, protected routes, forgot/reset password)
 - Connected frontend Signup/Login to backend APIs
 - Created OTP verification page with 6-digit input
 - Added email domain validation (frontend + backend) — only gmail, yahoo, outlook etc. allowed
 - Added password strength meter on signup (8+ chars, uppercase, lowercase, number, special char)
-- Security audit: 6 critical issues found & fixed
+- Built Dashboard Layout (Sidebar, Top Header, responsive mobile view)
+- Built Photo Upload feature (Backend multer, Photo model; Frontend Drag & Drop UploadModal, Gallery View)
+- Security audit: 10 critical issues found & fixed
   - Removed hardcoded credentials from source code
   - Created root `.gitignore` to protect `.env`, `node_modules`, `venv`
   - Added rate limiting (10 auth/15min, 5 OTP/5min)
   - Added Zod validation middleware on all auth endpoints
   - Moved API URL to environment variable
   - Deleted test scripts with email references
+  - Fixed Logo navigation bug
+  - Hardened ProtectedRoute with API token verification
+  - Added global Axios 401 interceptor for auto-logout
+  - Verified backend data separation (IDOR checks)
 - Renamed "MemoraAI" → "PixMind" across all docs (8 files)
 - Created comprehensive README.md with teammate setup guide
 - Removed Vite boilerplate files (react.svg, vite.svg, App.css, oxlintrc, etc.)
-- Pushed to GitHub: https://github.com/KajalNautiyal/PixMind (3 commits)
 - **GitHub Repo:** https://github.com/KajalNautiyal/PixMind
-- **Next Priority:** Dashboard page, Photo upload, Gallery
+- **Next Priority:** Albums (Create, Edit, Add Photos) and Lightbox View
 

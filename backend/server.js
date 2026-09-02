@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
 const dotenv = require('dotenv');
+const path = require('path');
 const connectDB = require('./config/db');
 
 // Load env vars
@@ -9,6 +10,7 @@ dotenv.config();
 
 // Import routes
 const authRoutes = require('./routes/auth');
+const photoRoutes = require('./routes/photo');
 
 const app = express();
 
@@ -38,6 +40,10 @@ app.get('/api/v1/health', (req, res) => {
 
 // Routes
 app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/photos', photoRoutes);
+
+// Serve uploads folder statically so frontend can display images
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // 404 handler
 app.use((req, res) => {

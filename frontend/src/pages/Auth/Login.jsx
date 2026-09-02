@@ -59,8 +59,8 @@ const Login = () => {
       if (res.data.success) {
         localStorage.setItem('pixmind_token', res.data.data.token);
         localStorage.setItem('pixmind_user', JSON.stringify(res.data.data.user));
-        // TODO: Navigate to dashboard when ready
-        alert('✅ Login successful! Welcome to PixMind, ' + res.data.data.user.name);
+        // Navigate to dashboard
+        navigate('/dashboard', { replace: true });
       }
     } catch (err) {
       const msg = err.response?.data?.message || 'Login failed. Try again.';
@@ -110,7 +110,7 @@ const Login = () => {
             required
           />
           <div className="flex justify-end mt-2">
-            <Link to="#" className="text-sm font-medium text-[#6c5ce7] hover:text-[#5a4bd1] transition-colors">
+            <Link to="/forgot-password" className="text-sm font-medium text-[#6c5ce7] hover:text-[#5a4bd1] transition-colors">
               Forgot password?
             </Link>
           </div>
