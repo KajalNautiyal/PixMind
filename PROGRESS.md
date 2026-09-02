@@ -124,6 +124,12 @@
 
 ## 📝 Session Log
 
+### Session — 2026-09-02 (Current)
+- **UI Redesign**: Overhauled Landing, Auth (Login/Signup), and Dashboard pages with premium glassmorphic UI, Framer Motion animations, and modern gradients.
+- **Routing & Security Fix**: Implemented `GuestRoute` to prevent logged-in users from accessing Auth pages, redirecting them to Dashboard.
+- **Cache Fix**: Fixed a bug where hitting "Back" after Logout would allow access to the Dashboard from the browser's BFCache by implementing a hard reload (`window.location.href`).
+- **CSS Bug Fix**: Fixed a transparent emoji bug in the dashboard greeting caused by `bg-clip-text`.
+
 ### Session — 2026-08-31
 - Reviewed full project status
 - Created PROGRESS.md for cross-session context
