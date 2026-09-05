@@ -1,159 +1,240 @@
 # PixMind (PixMind) — Project Progress Tracker
 
-> **Last Updated:** 2026-08-31
-> **Purpose:** Yeh file har chat session ke across context maintain karti hai. Naye chat mein AI ko bolo "read PROGRESS.md first" toh poora context mil jaayega.
+> **Last Updated:** 2026-09-05
+
+> **Purpose:** This file maintains project progress across all chat sessions and team members.
 
 ---
 
 ## 🏗️ Project Overview
 
-- **Name:** PixMind (folder: PixMind)
-- **Type:** Privacy-First Intelligent Cloud Photo & Memory Management Platform
-- **Team Size:** 4 members
-- **Tech Stack:** React + Vite + Tailwind (Frontend) | Node.js + Express (Backend) | Python + Flask (AI Service) | MongoDB Atlas + AWS S3
+* **Name:** PixMind
+* **Type:** Privacy-First Intelligent Cloud Photo & Memory Management Platform
+* **Team Size:** 4 Members
+* **Tech Stack:**
+
+  * Frontend: React + Vite + Tailwind CSS
+  * Backend: Node.js + Express.js
+  * AI Service: Python + Flask
+  * Database: MongoDB Atlas
+  * Storage: AWS S3 (Future Phase)
 
 ---
 
-## ✅ Completed Work
+# ✅ Completed Work
 
-### Documentation (100% Done)
-- [x] PRD (`prd.md`) — Full product requirements with 6 release phases
-- [x] Architecture (`architecture.md`) — System design, component ownership, API design
-- [x] Design (`design.md`) — UI/UX design guidelines
-- [x] Security (`security.md`) — Security requirements and standards
-- [x] Review (`review.md`) — Code review guidelines
-- [x] Rules (`rules.md`) — Development rules and conventions
+## 📄 Documentation (100% Done)
 
-### Frontend Setup (Scaffolding Done)
-- [x] Vite + React project initialized
-- [x] Dependencies installed: React Router, Axios, Framer Motion, Lucide React, Recharts, Zod
-- [x] Tailwind CSS v4 configured
-- [x] Basic routing setup (`App.jsx`)
-
-### Frontend — Auth UI (Done + Connected to Backend)
-- [x] `AuthLayout.jsx` — Shared layout for login/signup with branding
-- [x] `Login.jsx` — Login page connected to backend API, email domain validation
-- [x] `Signup.jsx` — Signup page connected to backend API, email domain validation, password strength meter
-- [x] `VerifyOTP.jsx` — 6-digit OTP verification page with auto-focus, paste, resend countdown
-- [x] `ForgotPassword.jsx` & `ResetPassword.jsx` — Password recovery flow
-- [x] `Button.jsx` — Reusable button component
-- [x] `Input.jsx` — Reusable input component with error display
-- [x] `services/api.js` — Axios API service with JWT token interceptor and 401 auto-logout
-
-### Backend — Auth API (Done + Secured)
-- [x] Express server (`server.js`) with Helmet, CORS, error handling
-- [x] MongoDB Atlas connection (`config/db.js`)
-- [x] User model with OTP fields, password hashing (`models/User.js`)
-- [x] Auth controller — register, verify-otp, resend-otp, login, getMe (`controllers/authController.js`)
-- [x] JWT middleware (`middleware/auth.js`)
-- [x] Zod validation middleware — email domain + password strength (`middleware/validate.js`)
-- [x] Rate limiting on auth routes (10 per 15 min, 5 OTP per 5 min)
-- [x] Email OTP sending via Gmail Nodemailer (`utils/mailer.js`)
-- [x] Auth routes with validation + rate limiting (`routes/auth.js`)
-- [x] `.env` / `.env.example` for team credential management
-
-### Security (Done)
-- [x] `.gitignore` at root + backend — .env, node_modules, test scripts protected
-- [x] No hardcoded credentials in source code
-- [x] Frontend API URL uses environment variable (`VITE_API_URL`)
-- [x] Backend validates email domains (only gmail, yahoo, outlook, etc.)
-- [x] Backend enforces strong passwords (uppercase, lowercase, number, special char, 8+ chars)
-- [x] Rate limiting prevents brute force attacks
-- [x] JWT tokens with expiry
-- [x] Passwords hashed with bcrypt (salt rounds: 12)
-- [x] OTP codes not returned in API responses
-- [x] OTP expiry (10 minutes)
-- [x] **Strict Frontend Route Protection**: Verifies token via API, redirects and clears storage if tampered.
-- [x] **Global 401 Auto-Logout**: Gracefully handles session expiry via Axios interceptor.
-- [x] **IDOR Prevention**: Hardened photo fetching/deletion to strict `req.userId` checks.
-
-### AI Service Setup (Partial)
-- [x] `requirements.txt` (Flask, OpenCV, YOLO, CLIP, InsightFace, EasyOCR, PyTorch)
-- [x] Python venv created
-- [ ] **No source code yet** — no Flask app, no endpoints
+* [x] PRD (`prd.md`)
+* [x] Architecture (`architecture.md`)
+* [x] Design (`design.md`)
+* [x] Security (`security.md`)
+* [x] Review (`review.md`)
+* [x] Rules (`rules.md`)
 
 ---
 
-## ❌ Remaining Work (MVP — Release 0.1)
+## 🎨 Frontend Setup
 
-### Backend — Photo Upload
-- [x] Photo model
-- [x] Upload routes & controller (Local uploads via multer)
-- [ ] S3 signed URL generation (Deferred to later phase)
-- [x] File validation (type, size max 10MB)
-
-### Frontend — Gallery & Upload
-- [x] Dashboard/Home page (Empty state + Image Grid)
-- [x] Photo upload UI (drag & drop modal)
-- [x] Photo gallery grid view (Masonry style placeholders)
-- [ ] Photo detail/lightbox view
-- [ ] Delete/download actions
-- [x] Upload progress indicator (Button loader)
-- [x] App layout (sidebar + header responsive)
-- [x] Protected route wrapper (Validates token against backend)
-
-### Frontend — Albums
-- [ ] Album list page
-- [ ] Create/edit/delete album
-- [ ] Add/remove photos from album
+* [x] Vite + React initialized.
+* [x] Tailwind CSS configured.
+* [x] React Router configured.
+* [x] Axios configured.
+* [x] Framer Motion installed.
+* [x] Lucide React icons installed.
 
 ---
 
-## 📋 Future Phases
+## 🔐 Frontend Authentication
 
-### Release 0.2 — Albums + Metadata + AI Indexing
-### Release 0.3 — Semantic Search
-### Release 0.4 — Face/Privacy/Cleanup
-### Release 0.5 — Memory + Assistant
-
----
-
-## 🔑 Key Decisions Made
-1. Frontend uses Tailwind CSS v4 (not v3)
-2. Backend uses Express v5 + Mongoose v9
-3. AI service is separate Python Flask service (not embedded in Node)
-4. MongoDB Atlas for data + vector search
-5. AWS S3 for media storage
-6. JWT for authentication
-7. Email OTP for signup verification (via Gmail App Password + Nodemailer)
-8. Email domain whitelist: gmail, yahoo, outlook, hotmail, etc.
-9. Password strength enforced: 8+ chars, uppercase, lowercase, number, special char
-10. Rate limiting: 10 auth attempts per 15 min, 5 OTP requests per 5 min
+* [x] Login Page.
+* [x] Signup Page.
+* [x] OTP Verification Page.
+* [x] Forgot Password.
+* [x] Reset Password.
+* [x] Auth Layout.
+* [x] Protected Route.
+* [x] Guest Route.
+* [x] JWT token interceptor using Axios.
 
 ---
 
-## 📝 Session Log
+## ⚙️ Backend Authentication
 
-### Session — 2026-09-02 (Current)
-- **UI Redesign**: Overhauled Landing, Auth (Login/Signup), and Dashboard pages with premium glassmorphic UI, Framer Motion animations, and modern gradients.
-- **Routing & Security Fix**: Implemented `GuestRoute` to prevent logged-in users from accessing Auth pages, redirecting them to Dashboard.
-- **Cache Fix**: Fixed a bug where hitting "Back" after Logout would allow access to the Dashboard from the browser's BFCache by implementing a hard reload (`window.location.href`).
-- **CSS Bug Fix**: Fixed a transparent emoji bug in the dashboard greeting caused by `bg-clip-text`.
+* [x] Express Server.
+* [x] MongoDB Connection.
+* [x] User Model.
+* [x] Register API.
+* [x] Login API.
+* [x] Verify OTP API.
+* [x] Resend OTP API.
+* [x] Forgot Password API.
+* [x] JWT Middleware.
+* [x] Zod Validation.
+* [x] Rate Limiting.
+* [x] Nodemailer OTP.
 
-### Session — 2026-08-31
-- Reviewed full project status
-- Created PROGRESS.md for cross-session context
-- Built complete backend Auth API (register, OTP verify, login, protected routes, forgot/reset password)
-- Connected frontend Signup/Login to backend APIs
-- Created OTP verification page with 6-digit input
-- Added email domain validation (frontend + backend) — only gmail, yahoo, outlook etc. allowed
-- Added password strength meter on signup (8+ chars, uppercase, lowercase, number, special char)
-- Built Dashboard Layout (Sidebar, Top Header, responsive mobile view)
-- Built Photo Upload feature (Backend multer, Photo model; Frontend Drag & Drop UploadModal, Gallery View)
-- Security audit: 10 critical issues found & fixed
-  - Removed hardcoded credentials from source code
-  - Created root `.gitignore` to protect `.env`, `node_modules`, `venv`
-  - Added rate limiting (10 auth/15min, 5 OTP/5min)
-  - Added Zod validation middleware on all auth endpoints
-  - Moved API URL to environment variable
-  - Deleted test scripts with email references
-  - Fixed Logo navigation bug
-  - Hardened ProtectedRoute with API token verification
-  - Added global Axios 401 interceptor for auto-logout
-  - Verified backend data separation (IDOR checks)
-- Renamed "MemoraAI" → "PixMind" across all docs (8 files)
-- Created comprehensive README.md with teammate setup guide
-- Removed Vite boilerplate files (react.svg, vite.svg, App.css, oxlintrc, etc.)
-- **GitHub Repo:** https://github.com/KajalNautiyal/PixMind
-- **Next Priority:** Albums (Create, Edit, Add Photos) and Lightbox View
+---
 
+## 🛡️ Security
+
+* [x] Helmet.
+* [x] CORS.
+* [x] Password Hashing (bcrypt).
+* [x] Email Validation.
+* [x] Strong Password Validation.
+* [x] Protected Dashboard Routes.
+* [x] Auto Logout on Invalid Token.
+* [x] `.env` secured.
+* [x] `.gitignore` configured.
+
+---
+
+# 📸 Member 4 — Photo Management & Optimization
+
+## ✅ Completed Features
+
+### Backend
+
+* [x] Photo Model (`Photo.js`).
+* [x] Multer Configuration for Local Uploads.
+* [x] Single Image Upload API.
+* [x] Multiple Image Upload API.
+* [x] File Type Validation.
+* [x] File Size Validation.
+* [x] Local Upload Storage (`backend/uploads`).
+
+### Metadata Extraction
+
+* [x] Integrated **Sharp**.
+* [x] Extracted Image Width.
+* [x] Extracted Image Height.
+* [x] Stored MIME Type.
+* [x] Stored File Size.
+
+### Duplicate Detection
+
+* [x] Integrated **MD5 File Hashing**.
+* [x] Detect duplicate images during upload.
+* [x] Skip uploading duplicate photos.
+* [x] Return duplicate photo names in API response.
+* [x] Smart Cleanup card shows duplicate photo count.
+
+### Frontend
+
+* [x] Created `PhotoManager.jsx`.
+* [x] Connected Photo Gallery with Backend API.
+* [x] Display uploaded photos.
+* [x] Display image metadata.
+* [x] Display Duplicate badge on duplicate photos.
+* [x] Dashboard Recent Uploads connected with backend.
+
+### GitHub
+
+* [x] Uploaded Photo Management module to GitHub.
+* [x] Removed uploaded images from GitHub repository.
+* [x] Added uploads folder to `.gitignore`.
+
+---
+
+# 🚧 Remaining Work (MVP)
+
+## Photo Management
+
+* [ ] Smart Cleanup (Delete duplicate photos with one click).
+* [ ] Image Optimization using Sharp.
+* [ ] Photo Metadata Management (Camera, Location, Date).
+* [ ] Photo Detail / Lightbox View.
+* [ ] Download Photo.
+* [ ] Delete Photo.
+
+## Albums
+
+* [ ] Album List Page.
+* [ ] Create Album.
+* [ ] Edit Album.
+* [ ] Delete Album.
+* [ ] Add Photos to Album.
+
+---
+
+# 📋 Future Releases
+
+### Release 0.2
+
+* Albums
+* Metadata
+* AI Indexing
+
+### Release 0.3
+
+* Semantic Search
+
+### Release 0.4
+
+* Face Detection
+* Privacy Detection
+* Smart Cleanup
+
+### Release 0.5
+
+* AI Memory Assistant
+
+---
+
+# 🔑 Key Decisions
+
+1. React + Vite frontend.
+2. Tailwind CSS v4.
+3. Express v5 backend.
+4. MongoDB Atlas database.
+5. Separate Python Flask AI service.
+6. JWT Authentication.
+7. OTP Verification using Nodemailer.
+8. MD5 Hashing for duplicate image detection.
+9. Sharp for metadata extraction and image optimization.
+10. Local uploads for MVP, AWS S3 in future releases.
+
+---
+
+# 📝 Session Log
+
+## Session — 2026-09-05 (Member 4)
+
+### Photo Management & Optimization
+
+* Implemented multiple photo upload using Multer.
+* Created Photo Gallery (`PhotoManager.jsx`).
+* Connected gallery with backend API.
+* Added image metadata extraction using Sharp.
+* Implemented duplicate photo detection using MD5 hashing.
+* Added Smart Cleanup dashboard card with duplicate count.
+* Added Duplicate badge in gallery.
+* Updated GitHub repository.
+* Removed uploaded images from repository tracking using `.gitignore`.
+
+**Next Task:** Smart Cleanup (Delete duplicate photos) and Image Optimization.
+
+---
+
+## Session — 2026-09-02
+
+* UI redesign for Landing, Auth and Dashboard.
+* Added GuestRoute and ProtectedRoute improvements.
+* Fixed dashboard cache/logout issue.
+* Fixed greeting emoji CSS issue.
+
+---
+
+## Session — 2026-08-31
+
+* Created initial project structure.
+* Completed authentication backend and frontend.
+* Connected MongoDB Atlas.
+* Added OTP verification.
+* Added Dashboard Layout.
+* Added Upload Modal.
+* Completed security improvements.
+* Created README.
+* Renamed MemoraAI to PixMind.
+* Initial GitHub repository setup.
