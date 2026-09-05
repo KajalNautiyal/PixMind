@@ -1,104 +1,118 @@
-const Photo = require('../models/Photo');
-const path = require('path');
-const fs = require('fs');
+const Photo = require("../models/Photo");
+const sharp = require("sharp");
+const md5File = require("md5-file");
 
-/**
- * @desc    Upload new photo
- * @route   POST /api/v1/photos/upload
- * @access  Private
- */
+// ===============================
+// Upload Multiple Photos
+// ===============================
 const uploadPhoto = async (req, res) => {
   try {
-    if (!req.file) {
-      return res.status(400).json({ success: false, message: 'Please upload an image file' });
+    // Check if files exist
+    if (!req.files || req.files.length === 0) {
+      return res.status(400).json({
+        success: false,
+        message: "Please upload at least one image.",
+      });
     }
 
-    // Determine the URL for the frontend to access the file
-    // For local dev, it's just /uploads/filename
-    // In production, this would be an S3 URL
-    const fileUrl = `/uploads/${req.file.filename}`;
+    const uploadedPhotos = [];
+    const duplicatePhotos = [];
 
-    const newPhoto = await Photo.create({
-      user: req.userId,
-      filename: req.file.originalname,
-      url: fileUrl,
-      mimetype: req.file.mimetype,
-      size: req.file.size,
-    });
+    // Loop through uploaded files
+    for (const file of req.files) {
+      // Read image metadata
+      const metadata = await sharp(file.path).metadata();
+
+      // Generate unique hash for image
+      const hash = await md5File(file.path);
+
+      // Check duplicate in MongoDB
+      const existingPhoto = await Photo.findOne({ hash });
+
+      if (existingPhoto) {
+        duplicatePhotos.push(file.originalname);
+        console.log("Duplicate skipped:", file.originalname);
+        continue;
+      }
+
+      // Save photo in MongoDB
+      const photo = await Photo.create({
+        user: null, // Later connect logged-in user
+        filename: file.filename,
+        url: `/uploads/${file.filename}`,
+        mimetype: file.mimetype,
+        size: file.size,
+        hash, // Save hash
+
+        metadata: {
+          width: metadata.width,
+          height: metadata.height,
+          camera: metadata.model || "Unknown",
+          location: "Unknown",
+        },
+
+        aiTags: [],
+        isArchived: false,
+        isFavorite: false,
+      });
+
+      uploadedPhotos.push(photo);
+    }
 
     res.status(201).json({
       success: true,
-      data: newPhoto,
+      message: `${uploadedPhotos.length} photo(s) uploaded successfully!`,
+      uploaded: uploadedPhotos,
+      duplicates: duplicatePhotos,
     });
   } catch (error) {
-    console.error('Error uploading photo:', error);
-    res.status(500).json({ success: false, message: 'Server error during upload' });
+    console.error("Upload Error:", error);
+
+    res.status(500).json({
+      success: false,
+      message: "Upload failed",
+      error: error.message,
+    });
   }
 };
 
-/**
- * @desc    Get all photos for logged-in user
- * @route   GET /api/v1/photos
- * @access  Private
- */
-const getPhotos = async (req, res) => {
+// ===============================
+// Get All Photos
+// ===============================
+// Get All Photos
+const getAllPhotos = async (req, res) => {
   try {
-    const photos = await Photo.find({ user: req.userId })
-      .sort({ createdAt: -1 }) // Newest first
-      .limit(50); // Pagination can be added later
+    const photos = await Photo.find().sort({ createdAt: -1 });
+
+    // Count duplicate hashes
+    const hashCount = {};
+
+    photos.forEach((photo) => {
+      hashCount[photo.hash] = (hashCount[photo.hash] || 0) + 1;
+    });
+
+    // Add isDuplicate field
+    const updatedPhotos = photos.map((photo) => ({
+      ...photo.toObject(),
+      isDuplicate: hashCount[photo.hash] > 1,
+    }));
 
     res.status(200).json({
       success: true,
-      count: photos.length,
-      data: photos,
+      data: updatedPhotos,
     });
   } catch (error) {
-    console.error('Error fetching photos:', error);
-    res.status(500).json({ success: false, message: 'Server error fetching photos' });
-  }
-};
-
-/**
- * @desc    Delete a photo
- * @route   DELETE /api/v1/photos/:id
- * @access  Private
- */
-const deletePhoto = async (req, res) => {
-  try {
-    const photo = await Photo.findById(req.params.id);
-
-    if (!photo) {
-      return res.status(404).json({ success: false, message: 'Photo not found' });
-    }
-
-    // Ensure user owns the photo
-    if (photo.user.toString() !== req.userId) {
-      return res.status(401).json({ success: false, message: 'Not authorized to delete this photo' });
-    }
-
-    // Delete file from local filesystem
-    // Extract filename from the URL (e.g., /uploads/filename -> filename)
-    const filename = photo.url.split('/').pop();
-    const filePath = path.join(__dirname, '../uploads', filename);
-    
-    if (fs.existsSync(filePath)) {
-      fs.unlinkSync(filePath);
-    }
-
-    await photo.deleteOne();
-
-    res.status(200).json({
-      success: true,
-      message: 'Photo deleted successfully',
+    console.error(error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to fetch photos",
+      error: error.message,
     });
-  } catch (error) {
-    console.error('Error deleting photo:', error);
-    res.status(500).json({ success: false, message: 'Server error deleting photo' });
   }
 };
-
+// Export Controllers
+// ===============================
 module.exports = {
   uploadPhoto,
-  getPhotos,
-  deletePhoto,
+  getAllPhotos,
 };

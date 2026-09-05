@@ -15,7 +15,11 @@ const photoRoutes = require('./routes/photo');
 const app = express();
 
 // Security middleware
-app.use(helmet());
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 
 // CORS — allow frontend
 app.use(

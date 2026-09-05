@@ -2,13 +2,14 @@ const mongoose = require('mongoose');
 
 const photoSchema = new mongoose.Schema(
   {
-    user: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: 'User',
-      required: true,
-      index: true,
-    },
-    filename: {
+user: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  required: false,
+  default: null,
+},
+
+filename: {
       type: String,
       required: true,
     },
@@ -20,17 +21,22 @@ const photoSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    size: {
-      type: Number,
-      required: true,
-    },
-    // Future fields for AI
-    metadata: {
-      width: Number,
-      height: Number,
-      camera: String,
-      location: String,
-    },
+   size: {
+  type: Number,
+  required: true,
+},
+
+hash: {
+  type: String,
+  unique: true,
+},
+
+metadata: {
+  width: Number,
+  height: Number,
+  camera: String,
+  location: String,
+},
     aiTags: [String],
     isArchived: {
       type: Boolean,

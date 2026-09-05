@@ -4,7 +4,7 @@ const { generateOTP, sendOTPEmail } = require('../utils/mailer');
 
 /**
  * POST /api/v1/auth/register
- * Register a new user + send OTP
+ * Register a new user (OTP skipped for local development)
  */
 const register = async (req, res) => {
   try {
@@ -12,49 +12,37 @@ const register = async (req, res) => {
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
-    if (existingUser && existingUser.isVerified) {
+
+    if (existingUser) {
       return res.status(400).json({
         success: false,
-        message: 'User already exists with this email',
+        message: "User already exists with this email",
       });
     }
 
-    // If user exists but not verified, delete old record
-    if (existingUser && !existingUser.isVerified) {
-      await User.deleteOne({ email });
-    }
-
-    // Generate OTP
-    const otp = generateOTP();
-    const otpExpiry = new Date(Date.now() + (process.env.OTP_EXPIRY_MINUTES || 10) * 60 * 1000);
-
-    // Create user
+    // Create user directly (already verified)
     const user = await User.create({
       name,
       email,
       password,
-      otp: {
-        code: otp,
-        expiresAt: otpExpiry,
-      },
+      isVerified: true, // Skip OTP verification
+      otp: undefined,
     });
-
-    // Send OTP email
-    await sendOTPEmail(email, otp, name);
 
     res.status(201).json({
       success: true,
-      message: 'Registration successful! OTP sent to your email.',
+      message: "Registration successful! You can login now.",
       data: {
         userId: user._id,
         email: user.email,
       },
     });
   } catch (error) {
-    console.error('Register error:', error);
+    console.error("Register error:", error);
+
     res.status(500).json({
       success: false,
-      message: 'Registration failed',
+      message: "Registration failed",
       error: error.message,
     });
   }

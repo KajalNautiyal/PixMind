@@ -22,3 +22,11 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# PixMind uploads
+backend/uploads/
+
+# Environment files
+backend/.env
+frontend/.env
+.env
