@@ -24,6 +24,10 @@ const userSchema = new mongoose.Schema(
       minlength: 6,
       select: false, // Don't return password in queries by default
     },
+    vaultPin: {
+      type: String,
+      select: false, // Security: Don't leak the PIN
+    },
     isVerified: {
       type: Boolean,
       default: false,

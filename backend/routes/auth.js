@@ -1,6 +1,6 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
-const { register, verifyOTP, resendOTP, login, getMe, forgotPassword, resetPassword } = require('../controllers/authController');
+const { register, verifyOTP, resendOTP, login, getMe, forgotPassword, resetPassword, setVaultPin, verifyVaultPin, checkVaultPinStatus } = require('../controllers/authController');
 const { protect } = require('../middleware/auth');
 const { validate, registerSchema, loginSchema, otpSchema, resendOTPSchema, forgotPasswordSchema, resetPasswordSchema } = require('../middleware/validate');
 
@@ -27,6 +27,12 @@ const otpLimiter = rateLimit({
   },
 });
 
+const pinLimiter = rateLimit({
+  windowMs: 5 * 60 * 1000, // 5 minutes
+  max: 10, // 10 PIN attempts
+  message: { success: false, message: 'Too many PIN attempts. Try again later.' },
+});
+
 // Public routes (with rate limiting + validation)
 router.post('/register', authLimiter, validate(registerSchema), register);
 router.post('/verify-otp', otpLimiter, validate(otpSchema), verifyOTP);
@@ -37,5 +43,8 @@ router.post('/reset-password', authLimiter, validate(resetPasswordSchema), reset
 
 // Protected routes
 router.get('/me', protect, getMe);
+router.post('/set-vault-pin', protect, setVaultPin);
+router.post('/verify-vault-pin', protect, pinLimiter, verifyVaultPin);
+router.get('/vault-pin-status', protect, checkVaultPinStatus);
 
 module.exports = router;

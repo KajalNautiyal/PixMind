@@ -46,6 +46,34 @@ metadata: {
       type: Boolean,
       default: false,
     },
+    // Privacy Vault
+    isPrivate: {
+      type: Boolean,
+      default: false,
+    },
+    isDismissed: {
+      type: Boolean,
+      default: false,
+    },
+    privacyFindings: [
+      {
+        type: { type: String },       // 'aadhaar', 'pan', 'credit_card', etc.
+        label: String,                // 'Aadhaar Card', 'PAN Card'
+        confidence: Number,
+        redacted_text: String,
+      },
+    ],
+    // Face Detection
+    facesDetected: {
+      type: Number,
+      default: 0,
+    },
+    // AI Processing Status
+    aiScanStatus: {
+      type: String,
+      enum: ['pending', 'processing', 'completed', 'failed'],
+      default: 'pending',
+    },
   },
   { timestamps: true }
 );

@@ -12,6 +12,7 @@ import ResetPassword from './pages/Auth/ResetPassword';
 import Landing from './pages/Landing/Landing';
 import Home from './pages/Dashboard/Home';
 import PhotoManager from "./pages/PhotoManager";
+import PrivacyVault from './pages/Dashboard/PrivacyVault';
 
 function App() {
   return (
@@ -35,14 +36,12 @@ function App() {
       
       {/* Protected Dashboard Routes */}
       <Route path="/dashboard" element={<ProtectedRoute />}>
-  <Route element={<DashboardLayout />}>
-    <Route index element={<Home />} />
-
-    {/* ⭐ Add this line */}
-    <Route path="photos" element={<PhotoManager />} />
-
-  </Route>
-</Route>
+        <Route element={<DashboardLayout />}>
+          <Route index element={<Home />} />
+          <Route path="photos" element={<PhotoManager />} />
+          <Route path="privacy" element={<PrivacyVault />} />
+        </Route>
+      </Route>
 
       {/* 404 Route */}
       <Route path="*" element={

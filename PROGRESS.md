@@ -1,6 +1,6 @@
 # PixMind (PixMind) — Project Progress Tracker
 
-> **Last Updated:** 2026-09-05
+> **Last Updated:** 2026-09-07
 
 > **Purpose:** This file maintains project progress across all chat sessions and team members.
 
@@ -12,7 +12,6 @@
 * **Type:** Privacy-First Intelligent Cloud Photo & Memory Management Platform
 * **Team Size:** 4 Members
 * **Tech Stack:**
-
   * Frontend: React + Vite + Tailwind CSS
   * Backend: Node.js + Express.js
   * AI Service: Python + Flask
@@ -32,70 +31,72 @@
 * [x] Review (`review.md`)
 * [x] Rules (`rules.md`)
 
----
+## 🎨 Frontend Setup (Scaffolding Done)
+- [x] Vite + React project initialized
+- [x] Dependencies installed: React Router, Axios, Framer Motion, Lucide React, Recharts, Zod
+- [x] Tailwind CSS v4 configured
+- [x] Basic routing setup (`App.jsx`)
 
-## 🎨 Frontend Setup
+## 🔐 Frontend — Auth UI (Done + Connected to Backend)
+- [x] `AuthLayout.jsx` — Shared layout for login/signup with branding
+- [x] `Login.jsx` — Login page connected to backend API, email domain validation
+- [x] `Signup.jsx` — Signup page connected to backend API, email domain validation, password strength meter
+- [x] `VerifyOTP.jsx` — 6-digit OTP verification page with auto-focus, paste, resend countdown
+- [x] `ForgotPassword.jsx` & `ResetPassword.jsx` — Password recovery flow
+- [x] `Button.jsx` — Reusable button component
+- [x] `Input.jsx` — Reusable input component with error display
+- [x] `services/api.js` — Axios API service with JWT token interceptor and 401 auto-logout
 
-* [x] Vite + React initialized.
-* [x] Tailwind CSS configured.
-* [x] React Router configured.
-* [x] Axios configured.
-* [x] Framer Motion installed.
-* [x] Lucide React icons installed.
+## ⚙️ Backend — Auth API (Done + Secured)
+- [x] Express server (`server.js`) with Helmet, CORS, error handling
+- [x] MongoDB Atlas connection (`config/db.js`)
+- [x] User model with OTP fields, password hashing (`models/User.js`)
+- [x] Auth controller — register, verify-otp, resend-otp, login, getMe (`controllers/authController.js`)
+- [x] JWT middleware (`middleware/auth.js`)
+- [x] Zod validation middleware — email domain + password strength (`middleware/validate.js`)
+- [x] Rate limiting on auth routes (10 per 15 min, 5 OTP per 5 min)
+- [x] Email OTP sending via Gmail Nodemailer (`utils/mailer.js`)
+- [x] Auth routes with validation + rate limiting (`routes/auth.js`)
+- [x] `.env` / `.env.example` for team credential management
 
----
+## 🛡️ Security (Done)
+- [x] `.gitignore` at root + backend — .env, node_modules, test scripts protected
+- [x] No hardcoded credentials in source code
+- [x] Frontend API URL uses environment variable (`VITE_API_URL`)
+- [x] Backend validates email domains (only gmail, yahoo, outlook, etc.)
+- [x] Backend enforces strong passwords (uppercase, lowercase, number, special char, 8+ chars)
+- [x] Rate limiting prevents brute force attacks
+- [x] JWT tokens with expiry
+- [x] Passwords hashed with bcrypt (salt rounds: 12)
+- [x] OTP codes not returned in API responses
+- [x] OTP expiry (10 minutes)
+- [x] **Strict Frontend Route Protection**: Verifies token via API, redirects and clears storage if tampered.
+- [x] **Global 401 Auto-Logout**: Gracefully handles session expiry via Axios interceptor.
+- [x] **IDOR Prevention**: Hardened photo fetching/deletion to strict `req.userId` checks.
 
-## 🔐 Frontend Authentication
+## 🧠 AI Service Setup (Phase 0 - Done)
+- [x] `requirements.txt` (Flask, OpenCV, YOLO, CLIP, InsightFace, EasyOCR, PyTorch)
+- [x] Python venv created
+- [x] Flask app setup (`ai-service/app.py`)
+- [x] Config file (`ai-service/config.py`)
+- [x] Health check endpoint working
 
-* [x] Login Page.
-* [x] Signup Page.
-* [x] OTP Verification Page.
-* [x] Forgot Password.
-* [x] Reset Password.
-* [x] Auth Layout.
-* [x] Protected Route.
-* [x] Guest Route.
-* [x] JWT token interceptor using Axios.
+## 🔒 Privacy Vault & AI Scanner (Phase 1 - Done)
+- [x] EasyOCR integration (`ai-service/privacy_scanner.py`)
+- [x] `/ai/privacy-scan` endpoint
+- [x] Privacy Node.js model + routes + controller
+- [x] Photo model update (`isPrivate` and `isDismissed` fields)
+- [x] Privacy Vault frontend page with Glassmorphism
+- [x] Auto-scan on photo upload
+- [x] "Move to Vault" / "Dismiss" actions
+- [x] Private photos hidden from gallery
+- [x] Photo Lightbox with Next/Prev keyboard & button navigation
+- [x] Lightbox AI suggestion integration
+- [x] 4-digit Vault PIN protection system (Auto-lock on tab switch)
 
----
-
-## ⚙️ Backend Authentication
-
-* [x] Express Server.
-* [x] MongoDB Connection.
-* [x] User Model.
-* [x] Register API.
-* [x] Login API.
-* [x] Verify OTP API.
-* [x] Resend OTP API.
-* [x] Forgot Password API.
-* [x] JWT Middleware.
-* [x] Zod Validation.
-* [x] Rate Limiting.
-* [x] Nodemailer OTP.
-
----
-
-## 🛡️ Security
-
-* [x] Helmet.
-* [x] CORS.
-* [x] Password Hashing (bcrypt).
-* [x] Email Validation.
-* [x] Strong Password Validation.
-* [x] Protected Dashboard Routes.
-* [x] Auto Logout on Invalid Token.
-* [x] `.env` secured.
-* [x] `.gitignore` configured.
-
----
-
-# 📸 Member 4 — Photo Management & Optimization
-
-## ✅ Completed Features
+## 📸 Photo Management & Optimization (Done)
 
 ### Backend
-
 * [x] Photo Model (`Photo.js`).
 * [x] Multer Configuration for Local Uploads.
 * [x] Single Image Upload API.
@@ -105,7 +106,6 @@
 * [x] Local Upload Storage (`backend/uploads`).
 
 ### Metadata Extraction
-
 * [x] Integrated **Sharp**.
 * [x] Extracted Image Width.
 * [x] Extracted Image Height.
@@ -113,7 +113,6 @@
 * [x] Stored File Size.
 
 ### Duplicate Detection
-
 * [x] Integrated **MD5 File Hashing**.
 * [x] Detect duplicate images during upload.
 * [x] Skip uploading duplicate photos.
@@ -121,7 +120,6 @@
 * [x] Smart Cleanup card shows duplicate photo count.
 
 ### Frontend
-
 * [x] Created `PhotoManager.jsx`.
 * [x] Connected Photo Gallery with Backend API.
 * [x] Display uploaded photos.
@@ -129,27 +127,19 @@
 * [x] Display Duplicate badge on duplicate photos.
 * [x] Dashboard Recent Uploads connected with backend.
 
-### GitHub
-
-* [x] Uploaded Photo Management module to GitHub.
-* [x] Removed uploaded images from GitHub repository.
-* [x] Added uploads folder to `.gitignore`.
 
 ---
 
 # 🚧 Remaining Work (MVP)
 
 ## Photo Management
-
 * [ ] Smart Cleanup (Delete duplicate photos with one click).
 * [ ] Image Optimization using Sharp.
 * [ ] Photo Metadata Management (Camera, Location, Date).
-* [ ] Photo Detail / Lightbox View.
 * [ ] Download Photo.
 * [ ] Delete Photo.
 
 ## Albums
-
 * [ ] Album List Page.
 * [ ] Create Album.
 * [ ] Edit Album.
@@ -159,31 +149,14 @@
 ---
 
 # 📋 Future Releases
-
-### Release 0.2
-
-* Albums
-* Metadata
-* AI Indexing
-
-### Release 0.3
-
-* Semantic Search
-
-### Release 0.4
-
-* Face Detection
-* Privacy Detection
-* Smart Cleanup
-
-### Release 0.5
-
-* AI Memory Assistant
+### Release 0.2: Albums + Metadata + AI Indexing
+### Release 0.3: Semantic Search
+### Release 0.4: Face/Privacy/Cleanup
+### Release 0.5: AI Memory Assistant
 
 ---
 
 # 🔑 Key Decisions
-
 1. React + Vite frontend.
 2. Tailwind CSS v4.
 3. Express v5 backend.
@@ -199,42 +172,21 @@
 
 # 📝 Session Log
 
-## Session — 2026-09-05 (Member 4)
+### Session — 2026-09-07 (Merged Branches)
+- Merged Privacy Vault and Photo Management features successfully. Both teammate's duplicate detection and AI vault scanning now run side-by-side in harmony.
 
-### Photo Management & Optimization
+### Session — 2026-09-05 (Member 4)
+- **Photo Management & Optimization**: Implemented multiple photo upload using Multer, image metadata extraction using Sharp, duplicate photo detection using MD5 hashing. Created Photo Gallery (`PhotoManager.jsx`) and added Smart Cleanup dashboard card.
 
-* Implemented multiple photo upload using Multer.
-* Created Photo Gallery (`PhotoManager.jsx`).
-* Connected gallery with backend API.
-* Added image metadata extraction using Sharp.
-* Implemented duplicate photo detection using MD5 hashing.
-* Added Smart Cleanup dashboard card with duplicate count.
-* Added Duplicate badge in gallery.
-* Updated GitHub repository.
-* Removed uploaded images from repository tracking using `.gitignore`.
+### Session — 2026-09-05 (Member 3)
+- **Phase 0 & 1 Completed**: Built the Python AI service using Flask and integrated EasyOCR for privacy scanning.
+- **Privacy Vault**: Created the Privacy Vault UI with "Active Alerts" and "Secured Vault" tabs.
+- **AI Auto-Scan**: Backend now automatically scans uploaded photos for sensitive data (Aadhaar, PAN, Cards).
+- **Security**: Added a highly secure 4-digit PIN system that locks the vault instantly when navigating away.
+- **Lightbox**: Implemented a sleek full-screen image viewer with Left/Right navigation and an intelligent AI "Move to Secure Vault" suggestion panel.
 
-**Next Task:** Smart Cleanup (Delete duplicate photos) and Image Optimization.
+### Session — 2026-09-02
+- UI redesign for Landing, Auth and Dashboard. Added GuestRoute and ProtectedRoute improvements.
 
----
-
-## Session — 2026-09-02
-
-* UI redesign for Landing, Auth and Dashboard.
-* Added GuestRoute and ProtectedRoute improvements.
-* Fixed dashboard cache/logout issue.
-* Fixed greeting emoji CSS issue.
-
----
-
-## Session — 2026-08-31
-
-* Created initial project structure.
-* Completed authentication backend and frontend.
-* Connected MongoDB Atlas.
-* Added OTP verification.
-* Added Dashboard Layout.
-* Added Upload Modal.
-* Completed security improvements.
-* Created README.
-* Renamed MemoraAI to PixMind.
-* Initial GitHub repository setup.
+### Session — 2026-08-31
+- Created initial project structure. Completed authentication backend and frontend. Connected MongoDB Atlas. Setup Upload Modal and Initial Security measures.

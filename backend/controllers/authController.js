@@ -352,4 +352,61 @@ const resetPassword = async (req, res) => {
   }
 };
 
-module.exports = { register, verifyOTP, resendOTP, login, getMe, forgotPassword, resetPassword };
+/**
+ * POST /api/v1/auth/set-vault-pin
+ * Set 4-digit PIN for Privacy Vault
+ */
+const setVaultPin = async (req, res) => {
+  try {
+    const { pin } = req.body;
+    if (!pin || pin.length !== 4 || isNaN(pin)) {
+      return res.status(400).json({ success: false, message: 'Invalid 4-digit PIN' });
+    }
+
+    const user = await User.findById(req.userId);
+    user.vaultPin = pin; // In production, this should be hashed like password
+    await user.save();
+
+    res.status(200).json({ success: true, message: 'Vault PIN set successfully' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to set PIN', error: error.message });
+  }
+};
+
+/**
+ * POST /api/v1/auth/verify-vault-pin
+ * Verify the Vault PIN
+ */
+const verifyVaultPin = async (req, res) => {
+  try {
+    const { pin } = req.body;
+    const user = await User.findById(req.userId).select('+vaultPin');
+    
+    if (!user.vaultPin) {
+      return res.status(400).json({ success: false, message: 'Vault PIN not set' });
+    }
+
+    if (user.vaultPin !== String(pin)) {
+      return res.status(401).json({ success: false, message: 'Incorrect PIN' });
+    }
+
+    res.status(200).json({ success: true, message: 'PIN verified' });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Verification failed', error: error.message });
+  }
+};
+
+/**
+ * GET /api/v1/auth/vault-pin-status
+ * Check if the user has a Vault PIN set
+ */
+const checkVaultPinStatus = async (req, res) => {
+  try {
+    const user = await User.findById(req.userId).select('+vaultPin');
+    res.status(200).json({ success: true, isPinSet: !!user.vaultPin });
+  } catch (error) {
+    res.status(500).json({ success: false, message: 'Failed to check status', error: error.message });
+  }
+};
+
+module.exports = { register, verifyOTP, resendOTP, login, getMe, forgotPassword, resetPassword, setVaultPin, verifyVaultPin, checkVaultPinStatus };

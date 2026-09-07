@@ -1,6 +1,9 @@
-const Photo = require("../models/Photo");
-const sharp = require("sharp");
-const md5File = require("md5-file");
+const Photo = require('../models/Photo');
+const path = require('path');
+const fs = require('fs');
+const sharp = require('sharp');
+const md5File = require('md5-file');
+const { triggerAIScan } = require('./privacyFaceController');
 
 // ===============================
 // Upload Multiple Photos
@@ -26,8 +29,8 @@ const uploadPhoto = async (req, res) => {
       // Generate unique hash for image
       const hash = await md5File(file.path);
 
-      // Check duplicate in MongoDB
-      const existingPhoto = await Photo.findOne({ hash });
+      // Check duplicate in MongoDB for THIS user
+      const existingPhoto = await Photo.findOne({ hash, user: req.userId });
 
       if (existingPhoto) {
         duplicatePhotos.push(file.originalname);
@@ -37,26 +40,27 @@ const uploadPhoto = async (req, res) => {
 
       // Save photo in MongoDB
       const photo = await Photo.create({
-        user: null, // Later connect logged-in user
+        user: req.userId, // Connect to logged-in user
         filename: file.filename,
         url: `/uploads/${file.filename}`,
         mimetype: file.mimetype,
         size: file.size,
         hash, // Save hash
-
         metadata: {
           width: metadata.width,
           height: metadata.height,
           camera: metadata.model || "Unknown",
           location: "Unknown",
         },
-
         aiTags: [],
         isArchived: false,
         isFavorite: false,
       });
 
       uploadedPhotos.push(photo);
+
+      // Trigger AI Scan in the background (fire and forget)
+      triggerAIScan(photo._id, req.userId);
     }
 
     res.status(201).json({
@@ -79,22 +83,26 @@ const uploadPhoto = async (req, res) => {
 // ===============================
 // Get All Photos
 // ===============================
-// Get All Photos
 const getAllPhotos = async (req, res) => {
   try {
-    const photos = await Photo.find().sort({ createdAt: -1 });
+    const photos = await Photo.find({ 
+      user: req.userId,
+      isPrivate: { $ne: true } // Don't show vault photos in main gallery
+    }).sort({ createdAt: -1 }).limit(100);
 
-    // Count duplicate hashes
+    // Count duplicate hashes (across user's photos)
     const hashCount = {};
 
     photos.forEach((photo) => {
-      hashCount[photo.hash] = (hashCount[photo.hash] || 0) + 1;
+      if(photo.hash) {
+        hashCount[photo.hash] = (hashCount[photo.hash] || 0) + 1;
+      }
     });
 
     // Add isDuplicate field
     const updatedPhotos = photos.map((photo) => ({
       ...photo.toObject(),
-      isDuplicate: hashCount[photo.hash] > 1,
+      isDuplicate: photo.hash ? (hashCount[photo.hash] > 1) : false,
     }));
 
     res.status(200).json({
@@ -110,6 +118,8 @@ const getAllPhotos = async (req, res) => {
     });
   }
 };
+
+// ===============================
 // Export Controllers
 // ===============================
 module.exports = {

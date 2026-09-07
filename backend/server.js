@@ -11,6 +11,8 @@ dotenv.config();
 // Import routes
 const authRoutes = require('./routes/auth');
 const photoRoutes = require('./routes/photo');
+const privacyRoutes = require('./routes/privacy');
+const faceRoutes = require('./routes/face');
 
 const app = express();
 
@@ -45,6 +47,8 @@ app.get('/api/v1/health', (req, res) => {
 // Routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/photos', photoRoutes);
+app.use('/api/v1/privacy', privacyRoutes);
+app.use('/api/v1/faces', faceRoutes);
 
 // Serve uploads folder statically so frontend can display images
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
