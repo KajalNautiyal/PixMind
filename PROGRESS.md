@@ -172,6 +172,12 @@
 
 # 📝 Session Log
 
+### Session — 2026-09-07 (UI & Architecture Enhancements)
+- **Trash Bin (Soft Deletion):** Implemented a Trash Bin system (`isDeleted` and `deletedAt`) replacing permanent hard deletes, with a 30-day retention policy and restore functionality.
+- **Duplicate Management:** Implemented UI grouping for duplicate photos via stacks. Added a "Review Duplicates" modal for precise, individual duplicate cleanup.
+- **Global Toast Notifications:** Replaced intrusive browser alerts with `react-hot-toast` for real-time, non-blocking feedback.
+- **Privacy Vault Refinement:** Refined privacy alerts logic to hide vaulted photos from the active alerts log.
+
 ### Session — 2026-09-07 (Merged Branches)
 - Merged Privacy Vault and Photo Management features successfully. Both teammate's duplicate detection and AI vault scanning now run side-by-side in harmony.
 
