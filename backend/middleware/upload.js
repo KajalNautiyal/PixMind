@@ -16,19 +16,22 @@ const storage = multer.diskStorage({
   },
 
   filename: (req, file, cb) => {
-    const uniqueName = Date.now() + path.extname(file.originalname);
+    // Preserve original name with a unique prefix to prevent collisions
+    const safeName = file.originalname.replace(/[^a-zA-Z0-9._-]/g, '_');
+    const uniqueName = `pixmind-${Date.now()}-${Math.round(Math.random() * 1e9)}${path.extname(safeName)}`;
     cb(null, uniqueName);
   },
 });
 
 // Accept ALL image files
-const fileFilter = (req, file, cb) => {
-  console.log("Uploading:", file.originalname);
+// Only accept real image mime types — no application/octet-stream bypass
+const ALLOWED_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml', 'image/bmp', 'image/tiff'];
 
-  if (file.mimetype.startsWith("image/") || file.mimetype === "application/octet-stream") {
+const fileFilter = (req, file, cb) => {
+  if (ALLOWED_TYPES.includes(file.mimetype)) {
     cb(null, true);
   } else {
-    cb(new Error("Please upload an image."));
+    cb(new Error('Only image files (JPEG, PNG, GIF, WebP) are allowed.'));
   }
 };
 
@@ -36,7 +39,7 @@ const upload = multer({
   storage,
   fileFilter,
   limits: {
-    fileSize: 5 * 1024 * 1024,
+    fileSize: 10 * 1024 * 1024,
   },
 });
 

@@ -1,9 +1,7 @@
-import axios from "axios";
+import api from './api';
 
-const API = "http://localhost:5000/api/v1/photos";
-
-// Get all photos
+// Get all photos — uses our authenticated Axios instance
 export const getPhotos = async () => {
-  const response = await axios.get(API);
+  const response = await api.get('/photos');
   return response.data.data;
 };

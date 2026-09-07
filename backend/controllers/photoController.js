@@ -87,7 +87,8 @@ const getAllPhotos = async (req, res) => {
   try {
     const photos = await Photo.find({ 
       user: req.userId,
-      isPrivate: { $ne: true } // Don't show vault photos in main gallery
+      isPrivate: { $ne: true }, // Don't show vault photos in main gallery
+      isDeleted: { $ne: true }  // Don't show trashed photos
     }).sort({ createdAt: -1 }).limit(100);
 
     // Count duplicate hashes (across user's photos)
@@ -120,9 +121,132 @@ const getAllPhotos = async (req, res) => {
 };
 
 // ===============================
+// Move Photos to Trash (Soft Delete)
+// ===============================
+const deletePhotos = async (req, res) => {
+  try {
+    const { photoIds } = req.body;
+    
+    if (!photoIds || !Array.isArray(photoIds) || photoIds.length === 0) {
+      return res.status(400).json({ success: false, message: "Provide an array of photoIds to delete" });
+    }
+
+    const result = await Photo.updateMany(
+      { _id: { $in: photoIds }, user: req.userId },
+      { $set: { isDeleted: true, deletedAt: new Date() } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Successfully moved ${result.modifiedCount} photo(s) to trash`,
+    });
+  } catch (error) {
+    console.error("Delete Error:", error);
+    res.status(500).json({
+      success: false,
+      message: "Failed to delete photos",
+      error: error.message,
+    });
+  }
+};
+
+// ===============================
+// Get Trash Photos
+// ===============================
+const getTrashPhotos = async (req, res) => {
+  try {
+    const photos = await Photo.find({ 
+      user: req.userId,
+      isDeleted: true
+    }).sort({ deletedAt: -1 });
+
+    res.status(200).json({
+      success: true,
+      data: photos,
+    });
+  } catch (error) {
+    console.error("Get Trash Error:", error);
+    res.status(500).json({ success: false, message: "Failed to fetch trash photos" });
+  }
+};
+
+// ===============================
+// Restore Photos from Trash
+// ===============================
+const restorePhotos = async (req, res) => {
+  try {
+    const { photoIds } = req.body;
+    if (!photoIds || !Array.isArray(photoIds) || photoIds.length === 0) {
+      return res.status(400).json({ success: false, message: "Provide photoIds to restore" });
+    }
+
+    const result = await Photo.updateMany(
+      { _id: { $in: photoIds }, user: req.userId },
+      { $set: { isDeleted: false, deletedAt: null } }
+    );
+
+    res.status(200).json({
+      success: true,
+      message: `Restored ${result.modifiedCount} photo(s)`,
+    });
+  } catch (error) {
+    console.error("Restore Error:", error);
+    res.status(500).json({ success: false, message: "Failed to restore photos" });
+  }
+};
+
+// ===============================
+// Empty Trash (Hard Delete)
+// ===============================
+const emptyTrash = async (req, res) => {
+  try {
+    const { photoIds } = req.body;
+    let query = { user: req.userId, isDeleted: true };
+    if (photoIds && Array.isArray(photoIds) && photoIds.length > 0) {
+      query._id = { $in: photoIds };
+    }
+
+    const photos = await Photo.find(query);
+    if (photos.length === 0) {
+      return res.status(200).json({ success: true, message: "Trash is already empty" });
+    }
+
+    const fs = require('fs');
+    const path = require('path');
+    let deletedCount = 0;
+
+    for (const photo of photos) {
+      await Photo.findByIdAndDelete(photo._id);
+      
+      try {
+        const filePath = path.join(__dirname, '..', photo.url);
+        if (fs.existsSync(filePath)) {
+          fs.unlinkSync(filePath);
+        }
+      } catch (err) {
+        console.error(`Failed to delete file from disk: ${photo.url}`, err);
+      }
+      deletedCount++;
+    }
+
+    res.status(200).json({
+      success: true,
+      message: `Permanently deleted ${deletedCount} photo(s)`,
+    });
+  } catch (error) {
+    console.error("Empty Trash Error:", error);
+    res.status(500).json({ success: false, message: "Failed to empty trash" });
+  }
+};
+
+// ===============================
 // Export Controllers
 // ===============================
 module.exports = {
   uploadPhoto,
   getAllPhotos,
+  deletePhotos,
+  getTrashPhotos,
+  restorePhotos,
+  emptyTrash,
 };

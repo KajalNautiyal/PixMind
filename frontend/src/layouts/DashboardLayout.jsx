@@ -14,7 +14,8 @@ import {
   LogOut, 
   Menu, 
   X,
-  User
+  User,
+  Trash2
 } from 'lucide-react';
 
 const SidebarLink = ({ to, icon: Icon, label, onClick }) => (
@@ -97,6 +98,7 @@ const DashboardLayout = () => {
             <div className="space-y-1">
               <SidebarLink to="/dashboard/privacy" icon={Shield} label="Privacy Vault" onClick={() => setIsSidebarOpen(false)} />
               <SidebarLink to="/dashboard/cleanup" icon={Sparkles} label="Smart Cleanup" onClick={() => setIsSidebarOpen(false)} />
+              <SidebarLink to="/dashboard/trash" icon={Trash2} label="Trash Bin" onClick={() => setIsSidebarOpen(false)} />
             </div>
           </div>
         </div>

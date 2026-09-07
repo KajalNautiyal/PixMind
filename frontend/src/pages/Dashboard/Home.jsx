@@ -1,9 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Sparkles, ShieldAlert, Image as ImageIcon, UploadCloud, ArrowRight } from 'lucide-react';
+import { Sparkles, ShieldAlert, Image as ImageIcon, UploadCloud, ArrowRight, CheckCircle2, Trash2, Layers } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import PhotoModal from '../../components/ui/PhotoModal';
+import ReviewDuplicatesModal from '../../components/ui/ReviewDuplicatesModal';
 import { photoAPI } from '../../services/api';
+import toast from 'react-hot-toast';
 
 const Home = () => {
   const navigate = useNavigate();
@@ -12,6 +14,9 @@ const Home = () => {
   const [duplicateCount, setDuplicateCount] = useState(0);
   const [isLoading, setIsLoading] = useState(true);
   const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [reviewPhotoGroup, setReviewPhotoGroup] = useState(null);
+  const [selectedPhotoIds, setSelectedPhotoIds] = useState([]);
+  const [isDeletingBulk, setIsDeletingBulk] = useState(false);
   
   const privacyAlertsCount = photos.filter(p => p.privacyFindings && p.privacyFindings.length > 0).length;
 
@@ -21,6 +26,30 @@ const Home = () => {
       setUser(JSON.parse(stored));
     }
     fetchPhotos();
+
+    // Listen for new photo uploads from the layout's upload modal
+    const handlePhotoUploaded = (e) => {
+      const newPhotos = e.detail; // Array of newly uploaded photos
+      if (Array.isArray(newPhotos)) {
+        setPhotos((prev) => [...newPhotos, ...prev]);
+      } else {
+        // Fallback just in case
+        setPhotos((prev) => [newPhotos, ...prev]);
+      }
+    };
+    window.addEventListener('photoUploaded', handlePhotoUploaded);
+
+    // Listen for photos being moved to vault
+    const handlePhotoVaulted = (e) => {
+      const vaultedPhotoId = e.detail;
+      setPhotos((prev) => prev.filter(p => p._id !== vaultedPhotoId));
+    };
+    window.addEventListener('photoVaulted', handlePhotoVaulted);
+
+    return () => {
+      window.removeEventListener('photoUploaded', handlePhotoUploaded);
+      window.removeEventListener('photoVaulted', handlePhotoVaulted);
+    };
   }, []);
 
   const fetchPhotos = async () => {
@@ -48,6 +77,63 @@ const Home = () => {
     hidden: { opacity: 0, y: 10 },
     visible: { opacity: 1, y: 0 }
   };
+
+  // Group photos by hash for stacking
+  const groupedPhotos = [];
+  const hashMap = {};
+
+  photos.forEach((photo) => {
+    if (photo.hash) {
+      if (!hashMap[photo.hash]) {
+        hashMap[photo.hash] = { ...photo, duplicates: [] };
+        groupedPhotos.push(hashMap[photo.hash]);
+      } else {
+        hashMap[photo.hash].duplicates.push(photo);
+      }
+    } else {
+      groupedPhotos.push({ ...photo, duplicates: [] });
+    }
+  });
+
+  const toggleSelection = (e, photoGroup) => {
+    e.stopPropagation();
+    const idsToToggle = [photoGroup._id, ...photoGroup.duplicates.map(d => d._id)];
+    
+    if (selectedPhotoIds.includes(photoGroup._id)) {
+      setSelectedPhotoIds(prev => prev.filter(id => !idsToToggle.includes(id)));
+    } else {
+      setSelectedPhotoIds(prev => [...prev, ...idsToToggle]);
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (!window.confirm(`Move ${selectedPhotoIds.length} photo(s) to Trash?`)) return;
+    
+    setIsDeletingBulk(true);
+    try {
+      const res = await photoAPI.deleteBulk(selectedPhotoIds);
+      if (res.data.success) {
+        toast.success(`Moved ${selectedPhotoIds.length} photo(s) to Trash`);
+        setPhotos(prev => prev.filter(p => !selectedPhotoIds.includes(p._id)));
+        setSelectedPhotoIds([]);
+      }
+    } catch (error) {
+      console.error("Failed to move bulk photos to trash", error);
+      toast.error("Failed to move photos to trash.");
+    } finally {
+      setIsDeletingBulk(false);
+    }
+  };
+
+  // Listen to single photo deletions from PhotoModal
+  useEffect(() => {
+    const handlePhotoDeleted = (e) => {
+      const deletedIds = e.detail; // Array of IDs
+      setPhotos((prev) => prev.filter(p => !deletedIds.includes(p._id)));
+    };
+    window.addEventListener('photoDeleted', handlePhotoDeleted);
+    return () => window.removeEventListener('photoDeleted', handlePhotoDeleted);
+  }, []);
 
   return (
     <motion.div className="max-w-6xl mx-auto space-y-8">
@@ -127,34 +213,60 @@ const Home = () => {
           <div className="flex justify-center p-12"><p>Loading photos...</p></div>
         ) : photos.length > 0 ? (
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
-            {photos.map((photo, i) => (
-              <motion.div 
-                key={photo._id} 
-                initial={{ opacity: 0, scale: 0.9 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.4, delay: i * 0.05 }}
-                whileHover={{ scale: 1.05, y: -5 }}
-                className="aspect-square rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-xl border border-gray-100 group relative cursor-pointer z-10"
-              >
-                {photo.isDuplicate && (
-                  <span className="absolute top-2 right-2 bg-red-500 text-white text-xs px-2 py-1 rounded-full z-20 shadow-md">
-                    Duplicate
-                  </span>
-                )}
-                <img 
-                  src={`${API_URL}${photo.url}`} 
-                  alt="Memory" 
-                  className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                  loading="lazy"
-                />
-                <div 
-                  onClick={() => setSelectedPhoto(photo)}
-                  className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end p-4 cursor-pointer"
+            {groupedPhotos.map((photoGroup, i) => {
+              const isSelected = selectedPhotoIds.includes(photoGroup._id);
+              
+              return (
+                <motion.div 
+                  key={photoGroup._id} 
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.4, delay: i * 0.05 }}
+                  whileHover={{ scale: 1.05, y: -5 }}
+                  onClick={() => setSelectedPhoto(photoGroup)}
+                  className={`aspect-square rounded-2xl overflow-hidden bg-white shadow-sm hover:shadow-xl border-2 transition-colors group relative cursor-pointer z-10 ${isSelected ? 'border-[#6c5ce7]' : 'border-gray-100'}`}
                 >
-                  <span className="text-white text-xs font-medium backdrop-blur-md bg-white/20 px-2 py-1 rounded-lg shadow-sm">View Details</span>
-                </div>
-              </motion.div>
-            ))}
+                  {/* Selection Checkbox */}
+                  <button 
+                    onClick={(e) => toggleSelection(e, photoGroup)}
+                    className={`absolute top-3 left-3 z-30 p-1 rounded-full backdrop-blur-md shadow-sm transition-all ${isSelected ? 'bg-[#6c5ce7] text-white opacity-100' : 'bg-white/50 text-gray-400 opacity-0 group-hover:opacity-100 hover:bg-white hover:text-gray-600'}`}
+                  >
+                    <CheckCircle2 size={20} className={isSelected ? 'fill-current' : ''} />
+                  </button>
+
+                  {/* Duplicate Stack Badge */}
+                  {photoGroup.duplicates.length > 0 && (
+                    <div className="absolute top-3 right-3 z-30 flex items-center gap-1">
+                      <span className="bg-white/90 text-[#6c5ce7] font-semibold text-xs px-2 py-1 rounded-full shadow-md backdrop-blur-md flex items-center gap-1 border border-[#6c5ce7]/20">
+                        <Layers size={14} /> +{photoGroup.duplicates.length}
+                      </span>
+                      <button 
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          setReviewPhotoGroup(photoGroup);
+                        }}
+                        className="bg-white/90 text-indigo-600 hover:bg-indigo-50 p-1.5 rounded-full shadow-md backdrop-blur-md transition-colors opacity-0 group-hover:opacity-100 border border-indigo-100"
+                        title={`Review ${photoGroup.duplicates.length} duplicate(s)`}
+                      >
+                        <Layers size={14} />
+                      </button>
+                    </div>
+                  )}
+                  
+                  <img 
+                    src={`${API_URL}${photoGroup.url}`} 
+                    alt="Memory" 
+                    className={`w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 ${isSelected ? 'scale-105 opacity-90' : ''}`}
+                    loading="lazy"
+                  />
+                  <div 
+                    className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-end p-4"
+                  >
+                    <span className="text-white text-xs font-medium backdrop-blur-md bg-white/20 px-2 py-1 rounded-lg shadow-sm">View Details</span>
+                  </div>
+                </motion.div>
+              );
+            })}
           </div>
         ) : (
           <div className="text-center border border-dashed border-gray-200 rounded-3xl p-16 bg-gray-50/50">
@@ -169,15 +281,52 @@ const Home = () => {
         photo={selectedPhoto} 
         onClose={() => setSelectedPhoto(null)} 
         onNext={() => {
-          const idx = photos.findIndex(p => p._id === selectedPhoto?._id);
-          if (idx !== -1 && idx < photos.length - 1) setSelectedPhoto(photos[idx + 1]);
+          const idx = groupedPhotos.findIndex(p => p._id === selectedPhoto?._id);
+          if (idx !== -1 && idx < groupedPhotos.length - 1) setSelectedPhoto(groupedPhotos[idx + 1]);
         }}
         onPrev={() => {
-          const idx = photos.findIndex(p => p._id === selectedPhoto?._id);
-          if (idx > 0) setSelectedPhoto(photos[idx - 1]);
+          const idx = groupedPhotos.findIndex(p => p._id === selectedPhoto?._id);
+          if (idx > 0) setSelectedPhoto(groupedPhotos[idx - 1]);
         }}
-        hasNext={photos.findIndex(p => p._id === selectedPhoto?._id) !== -1 && photos.findIndex(p => p._id === selectedPhoto?._id) < photos.length - 1}
-        hasPrev={photos.findIndex(p => p._id === selectedPhoto?._id) > 0}
+        hasNext={groupedPhotos.findIndex(p => p._id === selectedPhoto?._id) !== -1 && groupedPhotos.findIndex(p => p._id === selectedPhoto?._id) < groupedPhotos.length - 1}
+        hasPrev={groupedPhotos.findIndex(p => p._id === selectedPhoto?._id) > 0}
+      />
+
+      {/* Floating Action Bar for Bulk Deletion */}
+      {selectedPhotoIds.length > 0 && (
+        <motion.div 
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 bg-white rounded-full shadow-2xl shadow-indigo-900/20 px-6 py-4 flex items-center gap-6 border border-gray-100 z-50"
+        >
+          <div className="flex items-center gap-2">
+            <span className="bg-indigo-100 text-indigo-700 text-xs font-bold px-2.5 py-1 rounded-full">
+              {selectedPhotoIds.length}
+            </span>
+            <span className="text-sm font-semibold text-gray-700">Photos Selected</span>
+          </div>
+          
+          <div className="w-px h-8 bg-gray-200"></div>
+          
+          <button 
+            onClick={handleBulkDelete}
+            disabled={isDeletingBulk}
+            className="flex items-center gap-2 bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-full text-sm font-medium transition-colors shadow-md disabled:opacity-50"
+          >
+            <Trash2 size={16} />
+            {isDeletingBulk ? 'Moving...' : 'Move to Trash'}
+          </button>
+        </motion.div>
+      )}
+
+      {/* Review Duplicates Modal */}
+      <ReviewDuplicatesModal 
+        photoGroup={reviewPhotoGroup} 
+        onClose={() => setReviewPhotoGroup(null)}
+        onSuccess={(deletedIds) => {
+          setPhotos(prev => prev.filter(p => !deletedIds.includes(p._id)));
+          setReviewPhotoGroup(null);
+        }}
       />
     </motion.div>
   );

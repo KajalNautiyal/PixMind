@@ -13,11 +13,16 @@ import Landing from './pages/Landing/Landing';
 import Home from './pages/Dashboard/Home';
 import PhotoManager from "./pages/PhotoManager";
 import PrivacyVault from './pages/Dashboard/PrivacyVault';
+import TrashBin from './pages/Dashboard/TrashBin';
+
+import { Toaster } from 'react-hot-toast';
 
 function App() {
   return (
-    <Routes>
-      {/* Public / Guest Routes (Only accessible if NOT logged in) */}
+    <>
+      <Toaster position="bottom-right" reverseOrder={false} />
+      <Routes>
+        {/* Public / Guest Routes (Only accessible if NOT logged in) */}
       <Route element={<GuestRoute />}>
         {/* Landing Page */}
         <Route path="/" element={<LandingLayout />}>
@@ -40,6 +45,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="photos" element={<PhotoManager />} />
           <Route path="privacy" element={<PrivacyVault />} />
+          <Route path="trash" element={<TrashBin />} />
         </Route>
       </Route>
 
@@ -50,6 +56,7 @@ function App() {
         </div>
       } />
     </Routes>
+    </>
   );
 }
 

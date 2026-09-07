@@ -354,17 +354,20 @@ const resetPassword = async (req, res) => {
 
 /**
  * POST /api/v1/auth/set-vault-pin
- * Set 4-digit PIN for Privacy Vault
+ * Set 4-digit PIN for Privacy Vault (hashed with bcrypt)
  */
 const setVaultPin = async (req, res) => {
   try {
     const { pin } = req.body;
-    if (!pin || pin.length !== 4 || isNaN(pin)) {
+    if (!pin || String(pin).length !== 4 || isNaN(pin)) {
       return res.status(400).json({ success: false, message: 'Invalid 4-digit PIN' });
     }
 
+    const bcrypt = require('bcrypt');
+    const hashedPin = await bcrypt.hash(String(pin), 10);
+
     const user = await User.findById(req.userId);
-    user.vaultPin = pin; // In production, this should be hashed like password
+    user.vaultPin = hashedPin;
     await user.save();
 
     res.status(200).json({ success: true, message: 'Vault PIN set successfully' });
@@ -375,18 +378,25 @@ const setVaultPin = async (req, res) => {
 
 /**
  * POST /api/v1/auth/verify-vault-pin
- * Verify the Vault PIN
+ * Verify the Vault PIN (bcrypt compare)
  */
 const verifyVaultPin = async (req, res) => {
   try {
     const { pin } = req.body;
+    if (!pin || String(pin).length !== 4 || isNaN(pin)) {
+      return res.status(400).json({ success: false, message: 'Invalid PIN format' });
+    }
+
     const user = await User.findById(req.userId).select('+vaultPin');
     
     if (!user.vaultPin) {
       return res.status(400).json({ success: false, message: 'Vault PIN not set' });
     }
 
-    if (user.vaultPin !== String(pin)) {
+    const bcrypt = require('bcrypt');
+    const isMatch = await bcrypt.compare(String(pin), user.vaultPin);
+
+    if (!isMatch) {
       return res.status(401).json({ success: false, message: 'Incorrect PIN' });
     }
 

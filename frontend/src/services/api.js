@@ -53,7 +53,7 @@ export const photoAPI = {
     headers: { 'Content-Type': 'multipart/form-data' },
   }),
   getAll: () => api.get('/photos'),
-  delete: (id) => api.delete(`/photos/${id}`),
+  deleteBulk: (photoIds) => api.post('/photos/delete-bulk', { photoIds }),
 };
 
 export default api;
